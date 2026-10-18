@@ -13,7 +13,7 @@ const layerGroups = {
 };
 
 // Memuat Data Referensi
-fetch('assets/data/Admin_Kecamatan.json').then(r => r.json()).then(data => {
+fetch('assets/data/reference/admin-kecamatan.json').then(r => r.json()).then(data => {
     L.geoJSON(data, {
         style: function (f) {
             const n = (f.properties.Ket || "").toUpperCase();
@@ -30,11 +30,11 @@ fetch('assets/data/Admin_Kecamatan.json').then(r => r.json()).then(data => {
     }).addTo(layerGroups.kecamatan);
 });
 
-fetch('assets/data/Sungai.geojson').then(r => r.json()).then(data => {
+fetch('assets/data/reference/sungai.geojson').then(r => r.json()).then(data => {
     L.geoJSON(data, { style: { color: "#3498db", weight: 1.5, opacity: 0.8 } }).addTo(layerGroups.sungai);
 });
 
-fetch('assets/data/Sungai_Besar.geojson').then(r => r.json()).then(data => {
+fetch('assets/data/reference/sungai-besar.geojson').then(r => r.json()).then(data => {
     L.geoJSON(data, { style: { color: "#2980b9", weight: 3, opacity: 1 } }).addTo(layerGroups.sungaiBesar);
 });
 
@@ -74,9 +74,10 @@ function formatWaktu(menit) {
 
 // B. Memuat Semua File GeoJSON Sekaligus Secara Paralel (Pre-loading)
 const fetchPromises = timeSteps.map(menit => {
-    return fetch(`assets/data/banjir_${menit}menit.geojson`)
+    const menitFormat = String(menit).padStart(3, '0');
+    return fetch(`assets/data/flood/banjir-${menitFormat}-menit.geojson`)
         .then(response => {
-            if (!response.ok) throw new Error(`File banjir_${menit}menit.geojson tidak ditemukan`);
+            if (!response.ok) throw new Error(`File banjir-${menit}-menit.geojson tidak ditemukan`);
             return response.json();
         })
         .then(data => {
