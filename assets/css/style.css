@@ -1,0 +1,159 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body,
+html {
+    height: 100%;
+    width: 100%;
+    background-color: #f4f6f8;
+}
+
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 350px;
+    background-color: #ffffff;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.sidebar-header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+}
+
+.sidebar-header h2 {
+    font-size: 1.15rem;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.sidebar-header p {
+    font-size: 0.85rem;
+    color: #bdc3c7;
+}
+
+.control-group {
+    padding: 20px;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.control-group h3 {
+    font-size: 0.95rem;
+    color: #34495e;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.layer-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #555;
+    user-select: none;
+}
+
+.layer-checkbox input {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+#map {
+    flex-grow: 1;
+    height: 100%;
+    z-index: 1;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    color: #7f8c8d;
+    font-style: italic;
+    border-top: 1px solid #ecf0f1;
+}
+
+/* GAYA UNTUK PEMUTAR ANIMASI (PLAYER UI) */
+.player-section {
+background-color: #f0f7fa;
+border-bottom: 3px solid #3498db;
+}
+
+.time-display-box {
+    text-align: center;
+    margin-bottom: 15px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #dcdde1;
+}
+
+.time-display-box h1 {
+    color: #2980b9;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+#time-slider {
+    width: 100%;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+.player-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.player-controls button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#btn-play {
+    background-color: #2ecc71;
+    color: white;
+}
+
+#btn-play:hover:not(:disabled) {
+    background-color: #27ae60;
+}
+
+#btn-pause {
+    background-color: #e74c3c;
+    color: white;
+}
+
+#btn-pause:hover:not(:disabled) {
+    background-color: #c0392b;
+}
+
+.player-controls button:disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+    opacity: 0.7;
+}

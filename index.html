@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGIS Simulasi Banjir Kota Pontianak</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>SIMULASI BANJIR DI KOTA PONTIANAK</h2>
+                <p>Berdasarkan Durasi Waktu (0 - 12 Jam)</p>
+            </div>
+            
+            <div class="control-group">
+                <h3>Batas Administrasi & Referensi</h3>
+                <label class="layer-checkbox">
+                    <input type="checkbox" id="layerKecamatan" checked> 
+                    <span class="checkmark"></span> Batas Kecamatan
+                </label>
+                <label class="layer-checkbox">
+                    <input type="checkbox" id="layerSungai" checked> 
+                    <span class="checkmark"></span> Jaringan Sungai
+                </label>
+                <label class="layer-checkbox">
+                    <input type="checkbox" id="layerSungaiBesar" checked> 
+                    <span class="checkmark"></span> Sungai Besar
+                </label>
+            </div>
+
+            <!-- Bagian Pemutar Animasi Banjir -->
+            <div class="control-group player-section">
+                <h3>Simulasi Waktu Banjir</h3>
+                
+                <!-- Indikator Waktu -->
+                <div class="time-display-box">
+                    <span id="loading-status" style="color: #e74c3c; font-size: 12px; display: block; margin-bottom: 5px;">Memuat 24 data spasial... Harap tunggu.</span>
+                    <h1 id="time-display">0 Menit</h1>
+                </div>
+
+                <!-- Slider Waktu -->
+                <input type="range" id="time-slider" min="0" max="23" value="0" step="1" disabled>
+
+                <!-- Tombol Kontrol -->
+                <div class="player-controls">
+                    <button id="btn-play" disabled>▶ Putar (Play)</button>
+                    <button id="btn-pause" disabled>⏸ Jeda (Pause)</button>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <small>Tekan tombol Play untuk melihat pergerakan banjir, atau geser slider secara manual.</small>
+                <br><br>
+                <small>Oleh: Alvin Andrianto Ciputra (D1041231074)</small>
+                <small>Informatika | Universitas Tanjungpura</small>
+            </div>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="assets/js/script.js"></script>
+
+</body>
+</html>
