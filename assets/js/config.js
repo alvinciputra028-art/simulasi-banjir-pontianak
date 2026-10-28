@@ -4,10 +4,16 @@ export const MAP_CONFIG = {
 };
 
 export const FLOOD_CONFIG = {
-    startMinute: 30,
-    endMinute: 720,
-    stepMinute: 30,
+    frameCount: 25,
+    stepMinutes: 60,
     animationDelay: 1000
+};
+
+export const SCENARIO_PARAMETER_VALUES = {
+    rainfall: ['normal', 'heavy', 'extreme'],
+    waterLevel: ['normal', 'high-tidal'],
+    runoff: ['existing', 'worst'],
+    initialCondition: ['dry', 'wet']
 };
 
 export const DATA_PATHS = {
@@ -16,5 +22,6 @@ export const DATA_PATHS = {
         sungai: 'assets/data/reference/sungai.geojson',
         sungaiBesar: 'assets/data/reference/sungai-besar.geojson'
     },
-    flood: 'assets/data/flood'
+    scenarios: 'assets/data/scenarios',
+    scenarioManifest: 'assets/data/scenarios/manifest.json'
 };

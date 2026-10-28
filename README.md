@@ -1,6 +1,9 @@
 # WebGIS Simulasi Banjir Kota Pontianak
 
-Aplikasi WebGIS untuk memvisualisasikan simulasi genangan banjir di Kota Pontianak berdasarkan perubahan waktu. Aplikasi menampilkan peta interaktif, batas administrasi kecamatan, jaringan sungai, sungai besar, serta animasi data genangan dari 30 menit hingga 720 menit.
+Aplikasi WebGIS untuk memvisualisasikan hasil pre-calculated genangan banjir di
+Kota Pontianak berdasarkan perubahan waktu. Aplikasi menampilkan peta
+interaktif, layer referensi, dan 25 frame hasil Global Mapper dari menit ke-0
+hingga menit ke-1440.
 
 ## Fitur
 
@@ -8,12 +11,14 @@ Aplikasi WebGIS untuk memvisualisasikan simulasi genangan banjir di Kota Pontian
 - Menampilkan batas administrasi kecamatan.
 - Menampilkan jaringan sungai.
 - Menampilkan sungai besar.
-- Menampilkan data genangan banjir berdasarkan interval waktu 30 menit.
+- Memilih satu skenario yang terdaftar pada manifest melalui dropdown.
+- Menampilkan data genangan banjir berdasarkan interval waktu 60 menit.
 - Mengubah waktu simulasi menggunakan slider.
 - Memutar simulasi secara otomatis menggunakan tombol **Putar (Play)**.
 - Menghentikan simulasi menggunakan tombol **Jeda (Pause)**.
 - Menampilkan waktu simulasi dalam format menit dan jam.
-- Memuat seluruh data simulasi secara paralel sebelum pemutar diaktifkan.
+- Memuat satu file JSON skenario setelah skenario dipilih.
+- Membatalkan pemuatan skenario lama saat pilihan diganti dengan cepat.
 
 ## Teknologi
 
@@ -51,11 +56,8 @@ simulasi_banjir/
         │   ├── sungai.geojson
         │   └── sungai-besar.geojson
         │
-        └── flood/
-            ├── banjir-030-menit.geojson
-            ├── banjir-060-menit.geojson
-            ├── banjir-090-menit.geojson
-            └── ...
+        └── scenarios/
+            └── manifest.json
 ```
 
 ### Penjelasan folder
@@ -64,7 +66,8 @@ simulasi_banjir/
 - `assets/css/style.css`: style layout, sidebar, peta, kontrol layer, dan pemutar simulasi.
 - `assets/js/`: logika aplikasi yang dipisahkan berdasarkan tanggung jawab.
 - `assets/data/reference/`: data geografis yang tidak berubah mengikuti waktu simulasi.
-- `assets/data/flood/`: data genangan banjir berdasarkan waktu.
+- `assets/data/scenarios/`: manifest dan satu file JSON untuk setiap skenario
+  yang sudah tersedia.
 
 ## Arsitektur JavaScript
 
@@ -90,19 +93,17 @@ File ini dimuat menggunakan:
 Menyimpan konfigurasi terpusat:
 
 - Koordinat tengah dan zoom awal peta.
-- Waktu awal simulasi.
-- Waktu akhir simulasi.
-- Interval waktu antar data.
+- Jumlah frame dan interval waktu antarframe.
 - Kecepatan pergantian frame.
-- Path data referensi dan data banjir.
+- Path data referensi dan skenario.
 
 Konfigurasi simulasi saat ini:
 
 | Konfigurasi | Nilai |
 |---|---:|
-| Waktu awal | 30 menit |
-| Waktu akhir | 720 menit |
-| Interval data | 30 menit |
+| Frame | 0 sampai 24 (25 frame) |
+| Durasi simulasi | 0 sampai 1440 menit |
+| Interval data | 60 menit |
 | Kecepatan animasi | 1 detik per frame |
 
 ### `map.js`
@@ -123,10 +124,10 @@ Menangani layer referensi:
 
 Menangani seluruh proses simulasi:
 
-1. Membuat daftar waktu dari 30 sampai 720 menit.
-2. Membentuk path file berdasarkan pola nama data.
-3. Memuat seluruh file GeoJSON banjir secara paralel.
-4. Mengaktifkan slider dan tombol setelah proses pemuatan selesai.
+1. Memuat manifest dan hanya menampilkan skenario yang terdaftar.
+2. Memuat satu file JSON saat skenario dipilih.
+3. Memvalidasi schema, CRS, jumlah frame, urutan waktu, dan FeatureCollection.
+4. Membatalkan request skenario lama dengan `AbortController`.
 5. Menampilkan frame banjir yang sesuai.
 6. Mengatur pemutaran berulang menggunakan `setInterval`.
 7. Menghentikan animasi saat tombol pause ditekan atau slider digeser.
@@ -144,42 +145,50 @@ index.html
             │     └── Memuat data/reference/*.geojson
             │
             └── flood-simulation.js
-                  └── Memuat data/flood/banjir-XXX-menit.geojson
+                  ├── Memuat data/scenarios/manifest.json
+                  └── Memuat satu data/scenarios/{scenario}.json
 ```
 
 Saat aplikasi dibuka:
 
 1. Peta Leaflet dibuat pada koordinat awal.
 2. Layer referensi mulai dimuat.
-3. Seluruh data simulasi banjir dimuat secara paralel.
+3. Manifest skenario dimuat.
 4. Status pemuatan ditampilkan pada sidebar.
-5. Setelah semua proses selesai, slider dan tombol Play diaktifkan.
-6. Frame pertama, yaitu 30 menit, ditampilkan pada peta.
+5. Skenario yang dipilih dimuat dan divalidasi.
+6. Setelah berhasil, slider dan tombol Play diaktifkan.
+7. Frame pertama, yaitu menit ke-0, ditampilkan pada peta.
 
-## Format Data Banjir
+## Format Data Skenario
 
 Nama file harus mengikuti pola berikut:
 
 ```text
-banjir-{waktu tiga digit}-menit.geojson
+[hujan]__[pasang]__[limpasan]__[awal].json
 ```
 
 Contoh:
 
 ```text
-banjir-030-menit.geojson
-banjir-060-menit.geojson
-banjir-120-menit.geojson
-banjir-720-menit.geojson
+ekstrem__tinggi__terburuk__jenuh.json
 ```
 
-Format tiga digit wajib digunakan karena path file dibuat menggunakan `padStart(3, '0')`. Jika ingin menambahkan atau mengurangi waktu simulasi, sesuaikan nilai berikut pada [config.js](./assets/js/config.js):
+Setiap file harus mengikuti struktur `schemaVersion`, `scenario`, `spatial`,
+`time`, `provenance`, dan `frames` yang dijelaskan pada
+[ARSITEKTUR-REVISI-SIMULASI-BANJIR.md](./ARSITEKTUR-REVISI-SIMULASI-BANJIR.md).
+Daftarkan hanya file yang benar-benar tersedia di
+`assets/data/scenarios/manifest.json`.
+
+Setiap entri manifest juga wajib mencantumkan kode kategori
+`rainfall`, `waterLevel`, `runoff`, dan `initialCondition`. Kode yang valid
+adalah `normal`, `heavy`, `extreme`; `normal`, `high-tidal`; `existing`,
+`worst`; serta `dry`, `wet`, secara berurutan. Label yang ditampilkan kepada
+pengguna dapat tetap menggunakan Bahasa Indonesia.
 
 ```javascript
 export const FLOOD_CONFIG = {
-    startMinute: 30,
-    endMinute: 720,
-    stepMinute: 30,
+    frameCount: 25,
+    stepMinutes: 60,
     animationDelay: 1000
 };
 ```
@@ -257,8 +266,8 @@ Periksa hal berikut:
 
 - Apache sedang berjalan.
 - URL yang digunakan diawali `http://localhost/`.
-- Nama file pada `assets/data/flood/` sesuai pola yang ditentukan.
-- Path pada [config.js](./assets/js/config.js) benar.
+- File skenario terdaftar pada `assets/data/scenarios/manifest.json`.
+- Path dan nama file pada manifest benar.
 - Buka Developer Tools browser dan periksa tab **Console** atau **Network**.
 
 ### Peta tidak tampil
@@ -267,7 +276,9 @@ Periksa koneksi internet karena tile OpenStreetMap dan library Leaflet dimuat da
 
 ### Tombol Play tidak aktif
 
-Tombol Play baru diaktifkan setelah seluruh data banjir selesai diproses. Karena data GeoJSON cukup besar, proses awal dapat membutuhkan waktu dan memori browser yang signifikan.
+Tombol Play baru diaktifkan setelah satu file skenario berhasil dimuat dan
+divalidasi. Jika manifest masih kosong, aplikasi menampilkan validation error
+dan pemutar tetap nonaktif sampai hasil Global Mapper didaftarkan.
 
 ### Perubahan JavaScript tidak terlihat
 
